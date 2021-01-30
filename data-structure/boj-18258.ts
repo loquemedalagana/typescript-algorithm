@@ -1,41 +1,35 @@
 "use strict";
 import * as readline from 'readline';
 
-type DataType = number;
-
-type QueueNode = {
-  readonly data: DataType;
-  next?: QueueNode;
+type QueueNode<T> = {
+  readonly data: T;
+  next?: QueueNode<T>;
 }
 
-interface Queue {
+interface Queue<T> {
   readonly size: number;
-  readonly front: DataType;
-  readonly back: DataType;
+  readonly front: T;
+  readonly back: T;
 
-  push(data: DataType): void;
-  pop(): DataType;
+  push(data: T): void;
+  pop(): T;
   isEmpty(): boolean;
 }
 
-class QueueClass implements Queue {
+class QueueClass<T> implements Queue<T> {
   private _size: number = 0;
-  private head?: QueueNode; // 큐의 시작
-  private tail?: QueueNode; // 큐의 마지막
-
-  constructor() {}
+  private head?: QueueNode<T>; // 큐의 시작
+  private tail?: QueueNode<T>; // 큐의 마지막
 
   get size() {
     return this._size;
   }
 
   get front() {
-    if(this.isEmpty()) return -1;
     return this.head.data;
   }
 
   get back() {
-    if(this.isEmpty()) return -1;
     return this.tail.data;
   }
 
@@ -43,7 +37,7 @@ class QueueClass implements Queue {
     return this._size <= 0;
   }
 
-  push(data: DataType) {
+  push(data: T) {
     const oldTail = this.tail;
     this.tail = {
       data,
@@ -56,8 +50,8 @@ class QueueClass implements Queue {
     this._size++;
   }
 
-  pop() {
-    if(this.isEmpty()) return -1;
+  pop():T {
+    if(this.isEmpty()) throw Error("queue is empty");
     const deletedItem = this.head.data;
     this.head = this.head.next;
     this._size--;
@@ -71,7 +65,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const q = new QueueClass();
+const q = new QueueClass<number>();
 let ans: string = "";
 
 rl.on("line", function(line) {
@@ -83,7 +77,7 @@ rl.on("line", function(line) {
         q.push(Number(val));
         break;
       case "pop":
-        ans += (q.pop() + "\n");
+        ans += (q.isEmpty() ? "-1\n" : (q.pop() + "\n"));
         break;
       case "size":
         ans += (q.size + "\n");
@@ -92,10 +86,10 @@ rl.on("line", function(line) {
         ans += (q.isEmpty() ? "1\n" : "0\n");
         break;
       case "front":
-        ans += (q.front + "\n");
+        ans += (q.isEmpty() ? "-1\n" : (q.front + "\n"));
         break;
       case "back":
-        ans += (q.back + "\n");
+        ans += (q.isEmpty() ? "-1\n" : (q.back + "\n"));
         break;
     }
   }
